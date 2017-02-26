@@ -61,7 +61,7 @@ for idx, fname in enumerate(images):
     print(fname)
     img = cv2.imread(fname)
     dst = cv2.undistort(img, mtx, dist, None, mtx)
-    plt.figure(figsize=(10,15))
+    plt.figure(figsize=(15,5))
     plt.subplot(1, 2, 1)
     plt.imshow(img)
     plt.title('Original')
