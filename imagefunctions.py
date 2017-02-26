@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
 from trackers import trackerwincount, trackerconv
 
 # Sobel gradient in one direction and thresholding
@@ -60,7 +61,7 @@ def dir_threshold(img, sobel_kernel=3, thresh=(0, np.pi/2)):
     # Return the binary image
     return binary_output
 
-def extractpixels(imgBGR, plotall=False):
+def extractpixels(imgBGR, plotall=False, plotid=0):
     ###############################################
     # Threholding to extract pixels
     ###############################################
@@ -93,7 +94,7 @@ def extractpixels(imgBGR, plotall=False):
     combined2[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1)) | (s_binary == 1)] = 1
 
     if(plotall==True):
-        outfname = 'six_edges_' + str(idx) + '.jpg'
+        outfname = 'six_edges_' + str(plotid) + '.jpg'
         plt.figure(figsize=(25,15))
         plt.subplot(3, 2, 1)
         plt.imshow(gradx, cmap='gray')
@@ -118,7 +119,7 @@ def extractpixels(imgBGR, plotall=False):
     # Return the combined image
     return combined2
 
-def perspectiveTransform(undst_rgb, img_bin, plotall=False):
+def perspectiveTransform(undst_rgb, img_bin, plotall=False, plotid=0):
     # Define perspective transformation area
     img_size = (img_bin.shape[1], img_bin.shape[0]) #(1280, 720)
 
@@ -144,17 +145,17 @@ def perspectiveTransform(undst_rgb, img_bin, plotall=False):
     warped_bin = cv2.warpPerspective(img_bin, M, img_size, flags=cv2.INTER_LINEAR)
 
     if(plotall==True):
-        outfname = 'warped_' + str(idx) + '.jpg'
+        outfname = 'warped_' + str(plotid) + '.jpg'
         plt.subplot(131),plt.imshow(origimg),plt.title(fname) #('Input')
         plt.subplot(132),plt.imshow(warpedimg),plt.title('Warped Image')
         plt.subplot(133),plt.imshow(warpedbin, cmap='gray'),plt.title('Warped Lines')
         # plt.show()
-        outfname = 'warped_' + str(idx) + '.jpg'
+        outfname = 'warped_' + str(plotid) + '.jpg'
         plt.savefig(outfname)
 
     return M, Minv, warped, warped_bin
 
-def slidingWindowCount(warpedbin, leftdetected=False, rightdetected=False, left_fit=[], right_fit=[], plotall=False):
+def slidingWindowCount(warpedbin, leftdetected=False, rightdetected=False, left_fit=[], right_fit=[], plotall=False, plotid=0):
     # Instantiate tracker object
     curve_points = trackerwincount(mynwindows=9, mywinmargin = 60, myminpix = 50)
 
@@ -178,16 +179,16 @@ def slidingWindowCount(warpedbin, leftdetected=False, rightdetected=False, left_
         plt.plot(right_fitx, ploty, color='cyan', linewidth=4.0)
         plt.xlim(0, 1280)
         plt.ylim(720, 0)
-        plt.title('Results - Couning Sliding Window')
+        plt.title('Results - Counting Sliding Window')
         #plt.show()
-        outfname = 'res-warp_wincount_' + str(idx) + '.jpg'
+        outfname = 'res-warp_wincount_' + str(plotid) + '.jpg'
         plt.savefig(outfname)
         plt.close()
 
     #return leftx, lefty, rightx, righty, left_fit, right_fit, left_fitx, right_fitx, ploty, out_img, confidenceleft, confidenceright
     return leftx, lefty, rightx, righty, left_fit, right_fit, out_img, confidenceleft, confidenceright
 
-def slidingConvolution(warpedbin, plotall=False):
+def slidingConvolution(warpedbin, plotall=False, plotid=0):
     # Instantiate tracker object
     curve_centers = trackerconv()
 
@@ -227,7 +228,7 @@ def slidingConvolution(warpedbin, plotall=False):
         plt.ylim(720, 0)
         plt.title('Results - Convolution')
         #plt.show()
-        outfname = 'res-warp_convol_' + str(idx) + '.jpg'
+        outfname = 'res-warp_convol_' + str(plotid) + '.jpg'
         plt.savefig(outfname)
         plt.close()
 

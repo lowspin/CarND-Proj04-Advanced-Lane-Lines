@@ -16,7 +16,7 @@ f = open('calib_pickle.p','rb')
 mtx, dist = pickle.load(f)
 f.close()
 
-def processOneFrame(imgRGB):
+def processOneFrame(imgRGB, plotid=0):
     ###############################################
     # Keep track of things across frames
     ###############################################
@@ -48,9 +48,10 @@ def processOneFrame(imgRGB):
     ###############################################
     # #### Method 1 - Counting with Sliding Window
     # Use Fast search if BOTH lane lines were detected in the previous frame (Note: if not videomode, detected will not be True)
-    leftx, lefty, rightx, righty, left_fit, right_fit, out_img, confidenceleft, confidenceright = imagefunctions.slidingWindowCount(warpedbin, linetrackerleft.detected, linetrackerright.detected, linetrackerleft.current_fit, linetrackerright.current_fit )
+    leftx, lefty, rightx, righty, left_fit, right_fit, out_img, confidenceleft, confidenceright = imagefunctions.slidingWindowCount(warpedbin, linetrackerleft.detected, linetrackerright.detected, linetrackerleft.current_fit, linetrackerright.current_fit)
+    #leftx, lefty, rightx, righty, left_fit, right_fit, out_img, confidenceleft, confidenceright = imagefunctions.slidingWindowCount(warpedbin, False, False, [], [], True, plotid )
     # #### Method 2 - Convolutions
-    # #leftx, lefty, rightx, righty, left_fit, right_fit, out_img, confidenceleft, confidenceright = imagefunctions.slidingConvolution(warpedbin)
+    #leftx, lefty, rightx, righty, left_fit, right_fit, out_img, confidenceleft, confidenceright = imagefunctions.slidingConvolution(warpedbin, True, plotid )
 
     ###############################################
     # Sanity Check for Video Processing ONLY
@@ -168,26 +169,26 @@ def processOneFrame(imgRGB):
 ############################################################
 
 # Part 1 - Test Images
-#images = glob.glob('./test_images/*.jpg')
+images = glob.glob('./test_images/*.jpg')
 # images = glob.glob('./some_folder/*.jpg')
-# for idx, fname in enumerate(images):
-#     # load image
-#     img = cv2.imread(fname)
-#     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-#     result = processOneFrame(img_rgb)
-#
-#     plt.figure(figsize=(15,10))
-#     plt.imshow(result)
-#     outfname = 'result_' + str(idx) + '.jpg'
-#     plt.savefig(outfname)
-#     plt.close()
+for idx, fname in enumerate(images):
+    # load image
+    img = cv2.imread(fname)
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    result = processOneFrame(img_rgb, plotid=idx)
+
+    plt.figure(figsize=(15,10))
+    plt.imshow(result)
+    outfname = 'result_' + str(idx) + '.jpg'
+    plt.savefig(outfname)
+    plt.close()
 
 ############################################################
 
 # Part 2 - Video File
-from moviepy.editor import VideoFileClip
-result_output = 'result.mp4'
-clip1 = VideoFileClip("project_video.mp4")
-# clip1 = VideoFileClip("challenge_video.mp4")
-white_clip = clip1.fl_image(processOneFrame) # NOTE: this function expects color images!!
-white_clip.write_videofile(result_output, audio=False)
+# from moviepy.editor import VideoFileClip
+# result_output = 'result.mp4'
+# clip1 = VideoFileClip("project_video.mp4")
+# # clip1 = VideoFileClip("challenge_video.mp4")
+# white_clip = clip1.fl_image(processOneFrame) # NOTE: this function expects color images!!
+# white_clip.write_videofile(result_output, audio=False)
