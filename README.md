@@ -1,6 +1,6 @@
 # CarND-Proj04-Advanced-Lane-Lines
 
-##Background
+## Background
 This repository contains my project report for the [Udacity Self-Driving Car nano-degree](https://www.udacity.com/drive) program's project 4 - Advanced Lane Finding. The original starting files and instructions can be found [here](https://github.com/udacity/CarND-Advanced-Lane-Lines).
 
 ---
@@ -32,21 +32,21 @@ The goals / steps of this project are the following:
 [video1]: ./result.mp4 "Result Video"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
-###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
-###Writeup / README
+### Writeup / README
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
+#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  [Here](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) is a template writeup for this project you can use as a guide and a starting point.  
 
 You're reading it! This project is roughly divided into three sections: 
 - Camera calibration and distortion correction, 
 - Pipeline for single independent images,
 - Additional processing for time-sequence video frames
 
-###Camera Calibration
+### Camera Calibration
 
-####1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
+#### 1. Briefly state how you computed the camera matrix and distortion coefficients. Provide an example of a distortion corrected calibration image.
 
 The code for this step is contained in the standalone file `calcam.py`.  
 
@@ -63,15 +63,15 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 For the rest of the undistorted chessboard images, please see [here](https://github.com/lowspin/CarND-Proj04-Advanced-Lane-Lines/tree/master/output_images/chessboard_undistort).
 
-###Pipeline (single images)
+### Pipeline (single images)
 
-####1. Provide an example of a distortion-corrected image.
+#### 1. Provide an example of a distortion-corrected image.
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one (see `genimages.py` line 30):
 ![alt text][image3]
 ![alt text][image4]
 The first image is the original camera distorted image and the second is the result of distortion correction. As observed, the main effect is in the border regions.
 
-####2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
+#### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 I used a combination of color and gradient thresholds to generate a binary image (see `genimages.py` line 37, and `imagefunction.py` lines 74-77). I also tried converting the color-space to HLS and use the S-channel for detection. Here's an example of my output for this step.
 
 ![alt text][image5]
@@ -86,7 +86,7 @@ As labeled, these subplots are respectively from top left to bottom right:
 
 From these results, the final combined results seems to include the most relevant points for lane line detection. Hence, I have decided to use this combination for the rest of the project. (Note: see the result for the other test iamges [here](https://github.com/lowspin/CarND-Proj04-Advanced-Lane-Lines/tree/master/output_images/test-images-2-threshold-binary)).
 
-####3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
+#### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
 The code for my perspective transform includes a function called `perspectiveTransform()`, which appears in lines 121 through 155 in the file `imagefunctions.py`.  The `perspectiveTransform()` function takes as inputs two undistorted image (RGB image `undst_rgb` and thresholded binary image`img_bin`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
 
@@ -119,7 +119,7 @@ I verified that my perspective transform was working as expected by drawing the 
 
 ![alt text][image6]
 
-####4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
+#### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
 First, I extracted the pixels from the binary image that most likely belong to lane lines. I tried two methods - the sliding window and the convolution methods, as described below.
 
@@ -131,7 +131,7 @@ The second using convolution (`imagefunctions.py` lines 190-234) uses a similar 
 
 In the end, I decided to go with the sliding window method, because it seems more accurate.
 
-####5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
+#### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
 I did this in lines 99 through 121 in my code in `genimages.py`. First I used the standard pixel to meters conversion ratios for both x- and y-direction and scale the original x and y coordinates to real-world values and redo the `polyfit` operation to get the polynomial coefficients in real-world dimensions. Then I used the formula from the lecture to calculate the radius of curvatures for the left and right lane lines separately (`genimages.py` lines 109-110):
 ```
@@ -140,7 +140,7 @@ I did this in lines 99 through 121 in my code in `genimages.py`. First I used th
 ```
 To calculate the offset with respect to lane center, I first find the x-coordinates of the lane lines in the lowest point of the image frame (`genimages.py` llines 116-117) and calculate the mean, which gives the x-cordinate of the center of the lane right in front of the vehicle. Then, assuming the camera is mounted in the center of the vehicle, I find the difference between the horizontal center of the image to this lane center, which gives the offset.
 
-####6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
+#### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
 I implemented this step in lines 130 through 167 in my code in `genimages.py` in the function `processOneFrame()`.  Here is an example of my result on a test image:
 
@@ -150,17 +150,17 @@ The labels "Detected Left" and "Detected Right" are sanity check returned boolea
 
 ---
 
-###Pipeline (video)
+### Pipeline (video)
 
-####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
+#### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
 Here's a [link to my video result file](./result.mp4), or view it on [Youtube](https://youtu.be/AELMPOjgoOs)
 
 ---
 
-###Discussion
+### Discussion
 
-####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
+#### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 For sequentially correlated frames in a video file, we can do a few more things to improve reliability in the detection. 
 
